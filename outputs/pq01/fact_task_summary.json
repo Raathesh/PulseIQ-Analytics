@@ -1,0 +1,14 @@
+{
+  "table": "fact_task",
+  "rows_in": 28868,
+  "rows_passed": 28848,
+  "rows_quarantined": 20,
+  "reconciliation_ok": true,
+  "quarantine_reasons": {
+    "COMPLETED_BEFORE_STARTED": 12,
+    "MISSING_COMPLETED_DATE": 8
+  },
+  "warnings": [
+    "The contract requires started_date to be blank only for To Do; other status-specific completion rules were not inferred beyond the documented Done rule."
+  ]
+}

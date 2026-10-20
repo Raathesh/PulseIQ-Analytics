@@ -1,0 +1,76 @@
+{
+  "pipeline": "PQ-01 multi-feed ETL",
+  "feeds": [
+    {
+      "table": "fact_payroll",
+      "rows_in": 7344,
+      "rows_passed": 7340,
+      "rows_quarantined": 4,
+      "reconciliation_ok": true,
+      "quarantine_reasons": {
+        "DUPLICATE_EMPLOYEE_RUN": 2,
+        "UNMATCHED_EMPLOYEE_KEY": 2
+      }
+    },
+    {
+      "table": "fact_anomaly",
+      "rows_in": 405,
+      "rows_passed": 405,
+      "rows_quarantined": 0,
+      "reconciliation_ok": true,
+      "quarantine_reasons": {},
+      "warnings": [
+        "No documented reason_code allowlist was found; values were not quarantined by reason code.",
+        "scored_at is timezone-naive; UTC cannot be confirmed from the source schema.",
+        "model_version naming convention is not fully specified.",
+        "Attendance anomaly record IDs were validated through employee and month mapping rather than direct ID equality."
+      ]
+    },
+    {
+      "table": "fact_attrition_risk",
+      "rows_in": 430,
+      "rows_passed": 425,
+      "rows_quarantined": 5,
+      "reconciliation_ok": true,
+      "quarantine_reasons": {
+        "INCONSISTENT_AS_OF_DATE": 5,
+        "EMPLOYEE_KEY_NOT_VALID_AS_OF_DATE": 2
+      },
+      "warnings": [
+        "Risk-band percentile and tie-handling rules are not fully specified; no percentile-based quarantine was applied.",
+        "The modal as_of_date is used as a data-driven batch reference because the contract requires one date per batch."
+      ]
+    },
+    {
+      "table": "fact_forecast",
+      "rows_in": 72,
+      "rows_passed": 72,
+      "rows_quarantined": 0,
+      "reconciliation_ok": true,
+      "quarantine_reasons": {},
+      "warnings": [
+        "forecast_month_key uses month-end date keys while forecast_month is month-start.",
+        "Forecasts extend through March 2027, beyond the current dim_date coverage; unmatched future date keys are not quarantined by this validator."
+      ]
+    },
+    {
+      "table": "fact_task",
+      "rows_in": 28868,
+      "rows_passed": 28848,
+      "rows_quarantined": 20,
+      "reconciliation_ok": true,
+      "quarantine_reasons": {
+        "COMPLETED_BEFORE_STARTED": 12,
+        "MISSING_COMPLETED_DATE": 8
+      },
+      "warnings": [
+        "The contract requires started_date to be blank only for To Do; other status-specific completion rules were not inferred beyond the documented Done rule."
+      ]
+    }
+  ],
+  "total_rows_in": 37119,
+  "total_rows_passed": 37090,
+  "total_rows_quarantined": 29,
+  "all_feeds_reconciled": true,
+  "overall_reconciliation_ok": true
+}

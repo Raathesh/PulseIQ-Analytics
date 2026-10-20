@@ -1,0 +1,14 @@
+{
+  "table": "fact_anomaly",
+  "rows_in": 405,
+  "rows_passed": 405,
+  "rows_quarantined": 0,
+  "reconciliation_ok": true,
+  "quarantine_reasons": {},
+  "warnings": [
+    "No documented reason_code allowlist was found; values were not quarantined by reason code.",
+    "scored_at is timezone-naive; UTC cannot be confirmed from the source schema.",
+    "model_version naming convention is not fully specified.",
+    "Attendance anomaly record IDs were validated through employee and month mapping rather than direct ID equality."
+  ]
+}

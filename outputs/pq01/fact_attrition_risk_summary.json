@@ -1,0 +1,15 @@
+{
+  "table": "fact_attrition_risk",
+  "rows_in": 430,
+  "rows_passed": 425,
+  "rows_quarantined": 5,
+  "reconciliation_ok": true,
+  "quarantine_reasons": {
+    "INCONSISTENT_AS_OF_DATE": 5,
+    "EMPLOYEE_KEY_NOT_VALID_AS_OF_DATE": 2
+  },
+  "warnings": [
+    "Risk-band percentile and tie-handling rules are not fully specified; no percentile-based quarantine was applied.",
+    "The modal as_of_date is used as a data-driven batch reference because the contract requires one date per batch."
+  ]
+}

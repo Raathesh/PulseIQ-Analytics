@@ -1,0 +1,11 @@
+{
+  "table": "fact_payroll",
+  "rows_in": 7344,
+  "rows_passed": 7340,
+  "rows_quarantined": 4,
+  "reconciliation_ok": true,
+  "quarantine_reasons": {
+    "DUPLICATE_EMPLOYEE_RUN": 2,
+    "UNMATCHED_EMPLOYEE_KEY": 2
+  }
+}

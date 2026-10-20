@@ -1,0 +1,5 @@
+username,role,sees
+admin.demo,ADMIN,"Everything, including salary-level data"
+hr.demo,HR,"People and payroll aggregates; salary detail only for own department"
+manager.demo,MANAGER,"Own team metrics only; groups smaller than the minimum group size are hidden"
+exec.demo,EXECUTIVE,"Company-level KPIs only, no individual or small-group data"

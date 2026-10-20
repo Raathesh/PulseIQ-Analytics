@@ -1,0 +1,12 @@
+{
+  "table": "fact_forecast",
+  "rows_in": 72,
+  "rows_passed": 72,
+  "rows_quarantined": 0,
+  "reconciliation_ok": true,
+  "quarantine_reasons": {},
+  "warnings": [
+    "forecast_month_key uses month-end date keys while forecast_month is month-start.",
+    "Forecasts extend through March 2027, beyond the current dim_date coverage; unmatched future date keys are not quarantined by this validator."
+  ]
+}

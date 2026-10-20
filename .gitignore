@@ -1,0 +1,33 @@
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+
+# Jupyter temporary files
+.ipynb_checkpoints/
+
+# Virtual environments and local secrets
+.venv/
+venv/
+.env
+.env.*
+
+# Source datasets and validation answer materials
+03_Data/
+04_Validation_Vault/
+
+# Local DuckDB database files
+05_Starter/*.duckdb
+05_Starter/*.duckdb.wal
+05_Starter/*.duckdb.tmp
+
+# Generated passed datasets (retain quarantine evidence and JSON summaries)
+outputs/pq01/*_passed.csv
+
+# Keep row-level quarantine data local; commit aggregate JSON evidence
+outputs/pq01/*_quarantine.csv
+
+# Original hardcoded prototype; use etl_v2.py and etl_multi.py
+src/etl.py
+
+# Local notebook backups
+PQ-01_ETL_Validation_backup_*.ipynb
