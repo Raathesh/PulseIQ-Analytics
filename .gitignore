@@ -31,3 +31,13 @@ src/etl.py
 
 # Local notebook backups
 PQ-01_ETL_Validation_backup_*.ipynb
+# Local notebook backups and recovery copies
+PQ-01_ETL_Validation_backup_*.ipynb
+PQ-01_ETL_Validation_from_git.ipynb
+PQ-01_ETL_Validation_recovered.ipynb
+PQ-02_Star_Schema_Warehouse_backup_*.ipynb
+PQ-02_Star_Schema_Warehouse_browser_recovery.ipynb
+PQ-03_Data_Quality_Gatekeeper_backup*.ipynb
+PQ-03_Data_Quality_Gatekeeper_recovery_*.ipynb
+PQ-04_Governed_Metric_Layer_backup*.ipynb
+PQ-05_Workforce_Headcount_Dashboard_backup*.ipynb

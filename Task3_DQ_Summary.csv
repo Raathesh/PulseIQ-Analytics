@@ -1,0 +1,6 @@
+severity,status,execution_status,check_count
+Critical,BLOCKED,BLOCKED,1
+Critical,FAIL,EXECUTED,4
+Critical,PARTIAL,PARTIAL,1
+Critical,PASS,EXECUTED,1
+Warning,FAIL,EXECUTED,7

@@ -1,0 +1,6 @@
+metric_id,metric_name,calculated_value,formula_checked,validation_note
+M07,Gross pay,850032527.7299992,SUM(gross_pay) from fact_payroll,Calculated from warehouse; compare with catalog definition
+M08,Net pay,751403815.5299983,SUM(net_pay) from fact_payroll,Calculated from warehouse; compare with catalog definition
+M16,Revenue,1259204600.0,Negative signed total for ledger accounts 4001–4004,Calculated from warehouse; compare with catalog definition
+M17,Net profit,224665137.5799998,Negative signed total for 4xxx accounts minus positive signed total for 5xxx accounts,Calculated from warehouse; compare with catalog definition
+M22,Task completion rate,86.3031819806936,Done tasks / non-cancelled tasks × 100,Calculated from warehouse; compare with catalog definition
