@@ -1,0 +1,29 @@
+﻿client_id,paid_invoice_count,average_days_to_pay,median_days_to_pay,client_name,payment_terms_days,payment_behaviour,days_over_terms
+CL-016,12,121.25,129.5,Triveni Steel Industries,60,risky,61.25
+CL-014,11,105.36363636363636,108.0,Siruvani Agro Tech,45,risky,60.36363636363636
+CL-004,40,95.625,95.5,Kaveri Textiles Pvt Ltd,60,slow,35.625
+CL-025,8,91.5,92.5,Gulf Mercantile LLC,60,slow,31.5
+CL-011,25,89.56,87.0,Zephyr Hospitality Group,60,slow,29.560000000000002
+CL-007,33,77.42424242424242,78.0,Vaigai Foods & Beverages,45,slow,32.42424242424242
+CL-012,14,71.14285714285714,71.0,Indus Power Utilities,60,normal,11.142857142857139
+CL-022,16,57.125,55.5,Rheinwerk Systems GmbH,45,normal,12.125
+CL-008,25,56.52,57.0,Coromandel Auto Components,45,normal,11.520000000000003
+CL-006,42,54.5,53.0,NorthStar Telecom Ltd,45,normal,9.5
+CL-028,7,54.285714285714285,49.0,Pacifica Energy Corp,45,normal,9.285714285714285
+CL-002,77,54.0,53.0,BlueRiver Logistics Ltd,45,normal,9.0
+CL-027,8,53.625,50.5,Sakura Mobility KK,45,normal,8.625
+CL-017,12,53.083333333333336,53.0,Greenfield Realty Ltd,45,normal,8.083333333333336
+CL-026,8,52.75,54.5,Alpine Insure AG,45,normal,7.75
+CL-020,11,52.27272727272727,49.0,Harbourline Bank plc,45,normal,7.272727272727273
+CL-010,23,40.65217391304348,41.0,PeakEdge Education Pvt Ltd,30,normal,10.652173913043477
+CL-019,9,39.22222222222222,40.0,Nordic Freight AB,30,normal,9.222222222222221
+CL-001,128,38.03125,36.0,Meridian Retail Pvt Ltd,30,normal,8.03125
+CL-015,18,33.44444444444444,33.5,Marina Media Works,30,normal,3.444444444444443
+CL-005,30,30.533333333333335,28.0,Orchid Financial Services,30,prompt,0.533333333333335
+CL-003,39,29.333333333333332,29.0,Sunrise Healthcare Systems,30,prompt,-0.6666666666666679
+CL-021,11,29.272727272727273,28.0,Tasman Retail Pty Ltd,30,prompt,-0.7272727272727266
+CL-023,8,29.25,29.0,Maple Health Partners,30,prompt,-0.75
+CL-018,11,27.545454545454547,28.0,Atlas Commerce Inc,30,prompt,-2.4545454545454533
+CL-013,15,27.466666666666665,27.0,Aurora Pharma Ltd,30,prompt,-2.533333333333335
+CL-009,21,26.857142857142858,26.0,Lotus Insurance Brokers,30,prompt,-3.1428571428571423
+CL-024,14,26.642857142857142,26.5,Lion City Fintech Pte Ltd,30,prompt,-3.3571428571428577
