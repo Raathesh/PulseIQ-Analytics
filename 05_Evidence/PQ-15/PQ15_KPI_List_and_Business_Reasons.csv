@@ -1,0 +1,9 @@
+﻿Metric ID,KPI,September 2026 displayed result,Business reason,Interpretation / caveat
+M01,Headcount,451 published department subtotal,Shows the published workforce subtotal; suppressed groups are excluded.,Published subtotal only; not complete company headcount.
+M05,Rolling attrition,0.00%–26.58% department range,Highlights workforce stability by showing the spread across publishable departments.,Department spread only; not a company-wide average. No rolling target defined.
+M09,Employer cost,"₹55,014,384 published subtotal",Tracks the monthly employer-cost base for financial and workforce planning.,Suppressed department excluded; no target defined.
+M11,Overtime share,10/10 published departments on target,Identifies departments exceeding their approved overtime-share thresholds.,Compared department-by-department with official targets; no company percentage averaged.
+M13,Attendance,95.18% weighted published-department attendance,Measures workforce availability using scheduled-day-weighted attendance.,7/10 published departments meet the 94% target; suppressed group excluded.
+M17,Net profit,"₹14,985,979",Provides the headline monthly financial outcome from the governed ledger metric.,Company-month metric; no target defined.
+M21,Overdue receivables,"₹27,110,866 across 9 clients at 30-Sep-2026",Shows unpaid balances past due and the collection exposure at the reporting date.,Point-in-time snapshot; no trend available.
+M22,Task completion,85.51% for SP-38,Measures delivered work against planned work for the latest sprint ending in the selected month.,SP-38 ran 7–18 Sep 2026; 7/9 departments with defined targets meet 80%; D10 target missing.
