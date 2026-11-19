@@ -1,0 +1,16 @@
+metric,tolerance,comparable_rows,matches,mismatches
+Employer cost,0.01,198,196,2
+Gross pay,0.01,198,196,2
+Overtime cost,0.01,198,198,0
+Employees paid,0.0,198,196,2
+Overtime hours,0.01,198,198,0
+Late arrivals,0.0,198,196,2
+Attendance rate,5e-05,198,186,12
+Ending headcount,0.0,198,198,0
+Hires,0.0,198,198,0
+Exits,0.0,198,198,0
+Attrition rate,0.0001,198,198,0
+Tasks,0.0,162,162,0
+Tasks completed,0.0,162,162,0
+Story points completed,0.0,162,162,0
+Task completion rate,0.05,162,162,0

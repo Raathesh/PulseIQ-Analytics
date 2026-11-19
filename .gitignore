@@ -41,3 +41,32 @@ PQ-03_Data_Quality_Gatekeeper_backup*.ipynb
 PQ-03_Data_Quality_Gatekeeper_recovery_*.ipynb
 PQ-04_Governed_Metric_Layer_backup*.ipynb
 PQ-05_Workforce_Headcount_Dashboard_backup*.ipynb
+
+# PQ-16 release safety: exclude nested local data and generated files
+**/03_Data/
+**/04_Validation_Vault/
+**/05_Starter/*.duckdb
+**/05_Starter/*.duckdb.wal
+**/05_Starter/*.duckdb.tmp
+**/.venv/
+**/pq15_error.log
+**/pq15_test.log
+release_test/
+release_final_test/
+release_zip_check/
+PQ16_Final_Release_Test/
+build_report_backup.py
+*_backup.pdf
+inspect_*.py
+pq14_*inspection*.py
+pq14_*diagnostics*.py
+pq14_refine.py
+
+/bject -Unique
+
+# Local PQ-16 release and generated evidence
+/release/
+/05_Evidence.zip
+/05_Evidence/PQ-16/
+/outputs/monthly_report_*.pdf
+/05_Starter/import duckdb.py

@@ -1,0 +1,3 @@
+metric,forecast_months,overlapping_actual_months,MAPE_pct,status
+headcount_end,6,0,,Not yet measurable - no overlapping actual months
+attrition_rate_monthly_pct,6,0,,Not yet measurable - no overlapping actual months
