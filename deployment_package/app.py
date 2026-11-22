@@ -4,7 +4,7 @@ from pathlib import Path
 import altair as alt
 import pandas as pd
 import streamlit as st
-
+from kpi_explorer import render_kpi_explorer
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data"
 
@@ -23,6 +23,13 @@ st.warning(
 )
 
 st.caption("Reporting data cutoff: 30 September 2026 | Synthetic demonstration data")
+demo_role = st.selectbox(
+    "Select demo role",
+    ["ADMIN", "HR", "MANAGER", "EXECUTIVE"],
+    key="global_demo_role",
+)
+
+st.caption(f"Active demo role: {demo_role}")
 
 
 @st.cache_data
@@ -75,11 +82,43 @@ except Exception as exc:
     st.stop()
 
 
+
 def published(frame, value_column):
     return frame[
         (frame["privacy_status"] == "PUBLISHED")
         & frame[value_column].notna()
     ].copy()
+
+
+def apply_group_privacy(frame, group_column, size_column, minimum_size):
+    """
+    Apply primary and complementary suppression before displaying
+    grouped metrics or calculating company-level aggregates.
+    """
+    if frame.empty:
+        return frame.copy(), False
+
+    group_sizes = (
+        frame.groupby(group_column)[size_column]
+        .sum()
+        .sort_values()
+    )
+
+    suppressed = set(
+        group_sizes[group_sizes < minimum_size].index
+    )
+
+    # Complementary suppression: hide another group if only one
+    # group would otherwise be suppressed.
+    if len(suppressed) == 1 and len(group_sizes) > 1:
+        suppressed.add(group_sizes.index[1])
+
+    safe_frame = frame[
+        ~frame[group_column].isin(suppressed)
+    ].copy()
+
+    return safe_frame, bool(suppressed)
+
 
 
 headcount = d["m01_headcount_governed"]
@@ -109,6 +148,15 @@ selected_month = st.selectbox(
     format_func=lambda value: pd.Timestamp(value).strftime("%B %Y")
 )
 
+# Restrict non-admin roles to their permitted KPI Explorer view.
+if demo_role != "ADMIN":
+    render_kpi_explorer(
+        data=d,
+        selected_month=selected_month,
+        role=demo_role,
+    )
+    st.stop()
+
 selected_period = pd.Timestamp(selected_month).to_period("M")
 previous_period = selected_period - 1
 selected_label = selected_period.strftime("%B %Y")
@@ -123,16 +171,44 @@ hc_month = headcount[
     headcount["month_start_date"].dt.to_period("M") == selected_period
 ]
 hc_pub = published(hc_month, "headcount")
-total_headcount = int(hc_pub["headcount"].sum())
+
+hc_pub, hc_suppressed = apply_group_privacy(
+    hc_pub,
+    group_column="department_id",
+    size_column="headcount",
+    minimum_size=5,
+)
+
+total_headcount = (
+    int(hc_pub["headcount"].sum())
+    if not hc_suppressed and not hc_pub.empty
+    else None
+)
 
 hc_previous = headcount[
     headcount["month_start_date"].dt.to_period("M") == previous_period
 ]
-previous_headcount = int(
-    published(hc_previous, "headcount")["headcount"].sum()
+
+hc_previous_pub = published(hc_previous, "headcount")
+
+hc_previous_pub, hc_previous_suppressed = apply_group_privacy(
+    hc_previous_pub,
+    group_column="department_id",
+    size_column="headcount",
+    minimum_size=5,
 )
 
-headcount_change = total_headcount - previous_headcount
+previous_headcount = (
+    int(hc_previous_pub["headcount"].sum())
+    if not hc_previous_suppressed and not hc_previous_pub.empty
+    else None
+)
+
+headcount_change = (
+    total_headcount - previous_headcount
+    if total_headcount is not None and previous_headcount is not None
+    else None
+)
 
 
 # 2. Rolling 12-month attrition
@@ -140,6 +216,22 @@ attr_month = attrition[
     attrition["month_start_date"].dt.to_period("M") == selected_period
 ]
 attr_pub = published(attr_month, "attrition_rate_12m_pct")
+
+# Use raw selected-month headcount for attrition eligibility.
+attr_headcount = published(hc_month, "headcount")
+
+attr_pub = attr_pub.merge(
+    attr_headcount[["department_id", "headcount"]],
+    on="department_id",
+    how="inner"
+)
+
+attr_pub, attr_suppressed = apply_group_privacy(
+    attr_pub,
+    group_column="department_id",
+    size_column="headcount",
+    minimum_size=10,
+)
 
 if not attr_pub.empty:
     attr_min = attr_pub["attrition_rate_12m_pct"].min()
@@ -152,20 +244,26 @@ else:
     attr_min = attr_max = None
     highest_attrition_dept = "No published data"
 
-
 # 3. Employer cost
 cost_month = cost[
     cost["period_end_date"].dt.to_period("M") == selected_period
 ]
 cost_pub = published(cost_month, "employer_cost")
-total_employer_cost = cost_pub["employer_cost"].sum()
 
-cost_previous = cost[
-    cost["period_end_date"].dt.to_period("M") == previous_period
-]
-previous_employer_cost = published(
-    cost_previous, "employer_cost"
-)["employer_cost"].sum()
+cost_pub, cost_suppressed = apply_group_privacy(
+    cost_pub,
+    group_column="department_id",
+    size_column="employee_count",
+    minimum_size=5,
+)
+
+total_employer_cost = (
+    cost_pub["employer_cost"].sum()
+    if not cost_suppressed and not cost_pub.empty
+    else None
+)
+
+
 
 
 # 4. Overtime target compliance
@@ -173,6 +271,13 @@ ot_month = overtime[
     overtime["period_end_date"].dt.to_period("M") == selected_period
 ]
 ot_pub = published(ot_month, "overtime_share_pct")
+
+ot_pub, ot_suppressed = apply_group_privacy(
+    ot_pub,
+    group_column="department_id",
+    size_column="employees_paid",
+    minimum_size=5,
+)
 
 ot_check = ot_pub.merge(
     month_targets[["department_id", "overtime_share_target_pct"]],
@@ -192,6 +297,13 @@ att_month = attendance[
     attendance["period_end_date"].dt.to_period("M") == selected_period
 ]
 att_pub = published(att_month, "attendance_rate_pct")
+
+att_pub, att_suppressed = apply_group_privacy(
+    att_pub,
+    group_column="department_id",
+    size_column="employee_count",
+    minimum_size=5,
+)
 
 if not att_pub.empty and att_pub["total_scheduled_days"].sum() > 0:
     weighted_attendance = (
@@ -250,6 +362,7 @@ sprints_month = sprints[
     sprints["end_date"].dt.to_period("M") == selected_period
 ]
 
+task_suppressed = False
 if not sprints_month.empty:
     latest_sprint = sprints_month.sort_values("end_date").iloc[-1]
     sprint_id = latest_sprint["sprint_id"]
@@ -263,34 +376,50 @@ if not sprints_month.empty:
         how="left"
     )
 
-    task_detail = task_detail.groupby(
-        "department_id", as_index=False
-    ).agg(
-        planned_tasks=("planned_tasks", "sum"),
-        completed_tasks=("completed_tasks", "sum")
+    # Apply privacy checks at team level before department aggregation.
+    task_detail, task_suppressed = apply_group_privacy(
+        task_detail,
+        group_column="team_id",
+        size_column="planned_tasks",
+        minimum_size=5,
     )
 
-    task_detail["completion_rate_pct"] = (
-        task_detail["completed_tasks"]
-        / task_detail["planned_tasks"]
-        * 100
-    )
+    # If any team is suppressed, block department-level totals.
+    if task_suppressed or task_detail.empty:
+        task_detail = pd.DataFrame()
+        task_meeting = 0
+    else:
+        task_detail = task_detail.groupby(
+            "department_id", as_index=False
+        ).agg(
+            planned_tasks=("planned_tasks", "sum"),
+            completed_tasks=("completed_tasks", "sum")
+        )
 
-    task_detail = task_detail.merge(
-        month_targets[["department_id", "task_completion_target_pct"]],
-        on="department_id",
-        how="inner"
-    )
+        task_detail["completion_rate_pct"] = (
+            task_detail["completed_tasks"]
+            / task_detail["planned_tasks"]
+            * 100
+        )
 
-    task_meeting = int(
-        (
-            task_detail["completion_rate_pct"]
-            >= task_detail["task_completion_target_pct"]
-        ).sum()
-    )
+        task_detail = task_detail.merge(
+            month_targets[
+                ["department_id", "task_completion_target_pct"]
+            ],
+            on="department_id",
+            how="inner"
+        )
+
+        task_meeting = int(
+            (
+                task_detail["completion_rate_pct"]
+                >= task_detail["task_completion_target_pct"]
+            ).sum()
+        )
 else:
     task_detail = pd.DataFrame()
     task_meeting = 0
+
 
 
 st.markdown(f"### Reporting month: {selected_label}")
@@ -298,13 +427,24 @@ st.markdown(f"### Reporting month: {selected_label}")
 # KPI cards
 c1, c2, c3, c4 = st.columns(4)
 
-c1.metric(
-    "Published headcount",
-    f"{total_headcount:,}",
-    f"{headcount_change:+,} vs previous month"
-)
+if total_headcount is not None:
+    if headcount_change is not None:
+        c1.metric(
+            "Published headcount",
+            f"{total_headcount:,}",
+            f"{headcount_change:+,} vs previous month"
+        )
+    else:
+        c1.metric("Published headcount", f"{total_headcount:,}")
+        c1.caption("Previous-month comparison unavailable for privacy.")
+else:
+    c1.metric("Published headcount", "Suppressed")
+    c1.caption("Company total hidden because a department is suppressed.")
 
-if attr_min is not None:
+if attr_suppressed:
+    c2.metric("Rolling 12M attrition", "Suppressed")
+    c2.caption("Attrition results hidden because of group-size privacy.")
+elif attr_min is not None:
     c2.metric(
         "Rolling 12M attrition range",
         f"{attr_min:.1f}% – {attr_max:.1f}%"
@@ -313,28 +453,39 @@ if attr_min is not None:
 else:
     c2.metric("Rolling 12M attrition", "No data")
 
-c3.metric(
-    "Employer cost",
-    f"₹{total_employer_cost:,.0f}",
-    f"Previous: ₹{previous_employer_cost:,.0f}"
-)
+if total_employer_cost is not None:
+    c3.metric(
+        "Employer cost",
+        f"₹{total_employer_cost:,.0f}"
+    )
+else:
+    c3.metric("Employer cost", "Suppressed")
+    c3.caption("Company total hidden because a department is suppressed.")
 
-c4.metric(
-    "Overtime target compliance",
-    f"{ot_meeting}/{len(ot_check)} departments"
-    if not ot_check.empty else "No data"
-)
+if ot_suppressed:
+    c4.metric("Overtime target compliance", "Suppressed")
+    c4.caption("Department-level suppression prevents safe comparison.")
+else:
+    c4.metric(
+        "Overtime target compliance",
+        f"{ot_meeting}/{len(ot_check)} departments"
+        if not ot_check.empty else "No data"
+    )
 
 c5, c6, c7, c8 = st.columns(4)
 
-c5.metric(
-    "Weighted attendance",
-    f"{weighted_attendance:.2f}%"
-    if weighted_attendance is not None else "No data"
-)
-c5.caption(
-    f"Departments meeting target: {att_meeting}/{len(att_check)}"
-)
+if att_suppressed:
+    c5.metric("Weighted attendance", "Suppressed")
+    c5.caption("Company attendance hidden because a department is suppressed.")
+else:
+    c5.metric(
+        "Weighted attendance",
+        f"{weighted_attendance:.2f}%"
+        if weighted_attendance is not None else "No data"
+    )
+    c5.caption(
+        f"Departments meeting target: {att_meeting}/{len(att_check)}"
+    )
 
 c6.metric(
     "Net profit",
@@ -387,7 +538,73 @@ tab1, tab2, tab3, tab4 = st.tabs([
     "Task completion"
 ])
 
+
 with tab1:
+    if hc_pub.empty:
+        st.info("No safe headcount groups are available.")
+    else:
+        st.dataframe(
+            hc_pub[["department_id", "headcount"]],
+            width="stretch",
+            hide_index=True
+        )
+    if hc_suppressed:
+        st.warning("Some headcount groups are hidden for privacy.")
+
+with tab2:
+    attendance_view = att_pub[
+        ["department_id", "attendance_rate_pct"]
+    ].merge(
+        ot_pub[["department_id", "overtime_share_pct"]],
+        on="department_id",
+        how="outer"
+    )
+
+    if attendance_view.empty:
+        st.info("No safe attendance or overtime groups are available.")
+    else:
+        st.dataframe(
+            attendance_view,
+            width="stretch",
+            hide_index=True
+        )
+
+    if att_suppressed or ot_suppressed:
+        st.warning("Some attendance or overtime groups are hidden for privacy.")
+
+with tab3:
+    cost_view = cost_pub[
+        ["department_id", "employee_count", "employer_cost"]
+    ].merge(
+        attr_pub[["department_id", "attrition_rate_12m_pct"]],
+        on="department_id",
+        how="outer"
+    )
+
+    if cost_view.empty:
+        st.info("No safe employer-cost or attrition groups are available.")
+    else:
+        st.dataframe(
+            cost_view,
+            width="stretch",
+            hide_index=True
+        )
+
+    if cost_suppressed or attr_suppressed:
+        st.warning("Some employer-cost or attrition groups are hidden for privacy.")
+
+with tab4:
+    if not task_detail.empty:
+        st.dataframe(
+            task_detail,
+            width="stretch",
+            hide_index=True
+        )
+    else:
+        st.info("Task completion details are hidden or unavailable.")
+        if task_suppressed:
+            st.warning("Team-level suppression prevents department-level publication.")
+
     st.dataframe(
         hc_pub[["department_id", "headcount"]],
         width="stretch",
@@ -436,4 +653,11 @@ st.caption(
     "Privacy note: This demonstration uses synthetic department-level "
     "aggregates only. No employee names, employee IDs, client IDs, or "
     "production records are included."
+)
+st.divider()
+
+render_kpi_explorer(
+    data=d,
+    selected_month=selected_month,
+    role=demo_role,
 )
